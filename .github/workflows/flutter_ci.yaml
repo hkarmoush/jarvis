@@ -7,13 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout the repository
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # Install Flutter by using an official action
       - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v4
         with:
-          flutter-version: 'stable'
+          channel: stable
+      - run: flutter --version
 
       # Get Flutter dependencies
       - name: Flutter Pub Get
