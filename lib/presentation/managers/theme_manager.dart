@@ -13,19 +13,19 @@ class ThemeManager extends ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
 
-  Future<void> loadThemeMode() async {
+  Future<void> load() async {
     final themeModeEntity = await getThemeModeUseCase.call();
-    _themeMode = _mapThemeModeEntityToFlutter(themeModeEntity);
+    _themeMode = _map(themeModeEntity);
     notifyListeners();
   }
 
-  Future<void> setThemeMode(ThemeModeEntity themeModeEntity) async {
-    _themeMode = _mapThemeModeEntityToFlutter(themeModeEntity);
+  Future<void> set(ThemeModeEntity themeModeEntity) async {
+    _themeMode = _map(themeModeEntity);
     await setThemeModeUseCase.call(themeModeEntity);
     notifyListeners();
   }
 
-  ThemeMode _mapThemeModeEntityToFlutter(ThemeModeEntity themeModeEntity) {
+  ThemeMode _map(ThemeModeEntity themeModeEntity) {
     switch (themeModeEntity) {
       case ThemeModeEntity.light:
         return ThemeMode.light;

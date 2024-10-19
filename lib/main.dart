@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => getIt<ThemeManager>()..loadThemeMode(),
+      create: (_) => getIt<ThemeManager>()..load(),
       child: Consumer<ThemeManager>(
         builder: (context, themeManager, _) {
           if (Platform.isIOS) {
@@ -65,15 +65,15 @@ class HomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
-            onPressed: () => themeManager.setThemeMode(ThemeModeEntity.light),
+            onPressed: () => themeManager.set(ThemeModeEntity.light),
             child: Text('Switch to Light Theme'),
           ),
           ElevatedButton(
-            onPressed: () => themeManager.setThemeMode(ThemeModeEntity.dark),
+            onPressed: () => themeManager.set(ThemeModeEntity.dark),
             child: Text('Switch to Dark Theme'),
           ),
           ElevatedButton(
-            onPressed: () => themeManager.setThemeMode(ThemeModeEntity.system),
+            onPressed: () => themeManager.set(ThemeModeEntity.system),
             child: Text('Follow System Theme'),
           ),
         ],
@@ -92,15 +92,15 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CupertinoButton(
-              onPressed: () => themeManager.setThemeMode(ThemeModeEntity.light),
+              onPressed: () => themeManager.set(ThemeModeEntity.light),
               child: Text('Switch to Light Theme'),
             ),
             CupertinoButton(
-              onPressed: () => themeManager.setThemeMode(ThemeModeEntity.dark),
+              onPressed: () => themeManager.set(ThemeModeEntity.dark),
               child: Text('Switch to Dark Theme'),
             ),
             CupertinoButton(
-              onPressed: () => themeManager.setThemeMode(
+              onPressed: () => themeManager.set(
                 ThemeModeEntity.system,
               ),
               child: Text('Follow System Theme'),
