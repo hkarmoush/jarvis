@@ -6,20 +6,35 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install Flutter
-        run: |
-          sudo git clone https://github.com/flutter/flutter.git -b stable --depth 1
-          echo "$GITHUB_WORKSPACE/flutter/bin" >> $GITHUB_PATH
-          flutter pub get
+      # Checkout the repository
+      - uses: actions/checkout@v4
+
+      # Install Flutter by using an official action
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter --version
+
+      # Get Flutter dependencies
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      # Run Dart Code Metrics
       - name: Run Dart Code Metrics
         run: flutter pub run dart_code_metrics:metrics analyze lib/
+
+      # Run Tests and Collect Coverage
       - name: Run Tests with Coverage
         run: flutter test --coverage
+
+      # Generate HTML Report from coverage data
       - name: Generate HTML Report
         run: |
           sudo apt-get install lcov
           genhtml coverage/lcov.info -o coverage/html
+
+      # Upload the coverage report as an artifact using version 3
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v3
         with:
