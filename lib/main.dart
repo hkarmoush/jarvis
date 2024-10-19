@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jarvis/core/theme/app_theme.dart';
 import 'package:jarvis/domain/entities/theme_mode_entity.dart';
+import 'package:jarvis/domain/repositories/logger_repository.dart';
 import 'package:jarvis/injection.dart';
 import 'package:jarvis/presentation/managers/theme_manager.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final logger = getIt<LoggerRepository>();
+    logger.logInfo('Building MyApp');
     return ChangeNotifierProvider(
       create: (_) => getIt<ThemeManager>()..load(),
       child: Consumer<ThemeManager>(
