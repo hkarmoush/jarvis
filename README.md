@@ -875,3 +875,12 @@ This architecture leverages well-established packages and best practices to buil
 ---
 
 By following this architecture and utilizing the recommended packages, the development team can focus on delivering robust, scalable features with confidence in the application's underlying infrastructure.
+
+
+
+
+
+
+flutter pub run dart_code_metrics:metrics analyze lib/
+flutter test --coverage
+genhtml coverage/lcov.info -o coverage/html

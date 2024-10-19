@@ -1,0 +1,10 @@
+metrics:
+  cyclomatic-complexity: 20
+  lines-of-code: 150
+  number-of-parameters: 4
+  maximum-nesting-level: 5
+
+
+
+
+# flutter pub run dart_code_metrics:metrics analyze lib/

@@ -1,0 +1,36 @@
+name: Flutter CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Flutter
+        run: |
+          sudo git clone https://github.com/flutter/flutter.git -b stable --depth 1
+          echo "$GITHUB_WORKSPACE/flutter/bin" >> $GITHUB_PATH
+          flutter pub get
+
+      # Step for running dart_code_metrics
+      - name: Run Dart Code Metrics
+        run: flutter pub run dart_code_metrics:metrics analyze lib/
+
+      # Step for running tests and collecting coverage
+      - name: Run Tests with Coverage
+        run: flutter test --coverage
+
+      # Generate HTML Report from coverage data
+      - name: Generate HTML Report
+        run: |
+          sudo apt-get install lcov
+          genhtml coverage/lcov.info -o coverage/html
+
+      # Upload the coverage report as an artifact
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: coverage/html
