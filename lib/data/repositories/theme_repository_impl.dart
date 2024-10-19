@@ -3,18 +3,18 @@ import 'package:jarvis/domain/repositories/theme_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeRepositoryImpl implements ThemeRepository {
-  static const _themeKey = 'theme_mode';
+  static const themeKey = 'theme_mode';
 
   @override
   Future<void> saveThemeMode(ThemeModeEntity themeMode) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_themeKey, themeMode.toString());
+    await prefs.setString(themeKey, themeMode.toString());
   }
 
   @override
   Future<ThemeModeEntity> getThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
-    final themeString = prefs.getString(_themeKey);
+    final themeString = prefs.getString(themeKey);
     switch (themeString) {
       case 'ThemeModeEntity.light':
         return ThemeModeEntity.light;
