@@ -1,7 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
+import 'package:jarvis/data/data_source/image/local_image_data_source.dart';
+import 'package:jarvis/data/data_source/image/remote_image_data_source.dart';
+import 'package:jarvis/data/repositories/image/image_optimizer.dart';
+import 'package:jarvis/data/repositories/image/image_repository_impl.dart';
 import 'package:jarvis/data/repositories/logger_repository_impl.dart';
 import 'package:jarvis/data/repositories/theme_repository_impl.dart';
+import 'package:jarvis/domain/repositories/image_repository.dart';
 import 'package:jarvis/domain/repositories/logger_repository.dart';
 import 'package:jarvis/domain/repositories/theme_repository.dart';
 import 'package:jarvis/domain/usecases/get_theme_mode_usecase.dart';
@@ -82,4 +87,19 @@ abstract class NetworkModule {
       circuitBreaker,
     );
   }
+}
+
+@module
+abstract class ImageModule {
+  @LazySingleton(as: ImageRepository)
+  ImageRepository provideImageRepository(
+    RemoteImageDataSource remoteDataSource,
+    LocalImageDataSource localDataSource,
+    ImageOptimizer imageOptimizer,
+  ) =>
+      ImageRepositoryImpl(
+        remoteDataSource,
+        localDataSource,
+        imageOptimizer,
+      );
 }
