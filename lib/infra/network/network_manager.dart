@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:injectable/injectable.dart';
 import 'package:jarvis/domain/repositories/logger_repository.dart';
 import 'package:http/http.dart' as http;
-
 import 'circuit_breaker/circuit_breaker.dart';
 
 abstract class NetworkManager<T> {
