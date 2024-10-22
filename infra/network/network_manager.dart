@@ -4,6 +4,8 @@ import 'package:injectable/injectable.dart';
 import 'package:jarvis/domain/repositories/logger_repository.dart';
 import 'package:http/http.dart' as http;
 
+import 'circuit_breaker/circuit_breaker.dart';
+
 abstract class NetworkManager<T> {
   Future<T> get(
     String url, {
@@ -317,5 +319,71 @@ class RetryNetworkManager<T> implements NetworkManager<T> {
       }
     }
     throw Exception('Max retries reached');
+  }
+}
+
+class CircuitBreakerNetworkManager<T> implements NetworkManager<T> {
+  final NetworkManager<T> _wrapped;
+  final CircuitBreaker _circuitBreaker;
+
+  CircuitBreakerNetworkManager(
+    this._wrapped,
+    this._circuitBreaker,
+  );
+
+  @override
+  Future<T> get(
+    String url, {
+    Map<String, String>? headers,
+    Map<String, dynamic>? queryParams,
+  }) async {
+    return _performWithCircuitBreaker(() => _wrapped.get(
+          url,
+          headers: headers,
+          queryParams: queryParams,
+        ));
+  }
+
+  @override
+  Future<T> post(String url,
+      {Map<String, String>? headers, dynamic body}) async {
+    return _performWithCircuitBreaker(() => _wrapped.post(
+          url,
+          headers: headers,
+          body: body,
+        ));
+  }
+
+  @override
+  Future<T> put(String url,
+      {Map<String, String>? headers, dynamic body}) async {
+    return _performWithCircuitBreaker(() => _wrapped.put(
+          url,
+          headers: headers,
+          body: body,
+        ));
+  }
+
+  @override
+  Future<T> delete(String url, {Map<String, String>? headers}) async {
+    return _performWithCircuitBreaker(() => _wrapped.delete(
+          url,
+          headers: headers,
+        ));
+  }
+
+  Future<T> _performWithCircuitBreaker(Future<T> Function() action) async {
+    if (!_circuitBreaker.canProceed()) {
+      throw Exception('Circuit breaker is open');
+    }
+
+    try {
+      final result = await action();
+      _circuitBreaker.recordSuccess();
+      return result;
+    } catch (e) {
+      _circuitBreaker.recordFailure();
+      rethrow;
+    }
   }
 }
