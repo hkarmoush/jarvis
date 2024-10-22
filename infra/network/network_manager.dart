@@ -270,3 +270,52 @@ class AuthenticatedNetworkManager<T> implements NetworkManager<T> {
     return updatedHeaders;
   }
 }
+
+class RetryNetworkManager<T> implements NetworkManager<T> {
+  final NetworkManager<T> _wrapped;
+  final int maxAttempts;
+  final Duration delay;
+
+  RetryNetworkManager(this._wrapped,
+      {this.maxAttempts = 3, this.delay = const Duration(seconds: 1)});
+
+  @override
+  Future<T> get(String url,
+      {Map<String, String>? headers, Map<String, dynamic>? queryParams}) async {
+    return _retry(
+        () => _wrapped.get(url, headers: headers, queryParams: queryParams));
+  }
+
+  @override
+  Future<T> post(String url,
+      {Map<String, String>? headers, dynamic body}) async {
+    return _retry(() => _wrapped.post(url, headers: headers, body: body));
+  }
+
+  @override
+  Future<T> put(String url,
+      {Map<String, String>? headers, dynamic body}) async {
+    return _retry(() => _wrapped.put(url, headers: headers, body: body));
+  }
+
+  @override
+  Future<T> delete(String url, {Map<String, String>? headers}) async {
+    return _retry(() => _wrapped.delete(url, headers: headers));
+  }
+
+  Future<T> _retry(Future<T> Function() action) async {
+    int attempt = 0;
+    while (attempt < maxAttempts) {
+      try {
+        return await action();
+      } catch (e) {
+        attempt++;
+        if (attempt >= maxAttempts) {
+          rethrow;
+        }
+        await Future.delayed(delay);
+      }
+    }
+    throw Exception('Max retries reached');
+  }
+}
