@@ -96,16 +96,13 @@ class NetworkManagerImpl<T> implements NetworkManager<T> {
     dynamic body,
     Map<String, dynamic>? queryParams,
   }) async {
-    // Log the request
     _logger.logInfo('Performing $method request to $url');
 
-    // Apply query parameters if any
     if (queryParams != null && queryParams.isNotEmpty) {
       final queryString = Uri(queryParameters: queryParams).query;
       url = '$url?$queryString';
     }
 
-    // Send the request
     http.Response response;
     try {
       switch (method) {
@@ -139,7 +136,6 @@ class NetworkManagerImpl<T> implements NetworkManager<T> {
           throw UnimplementedError();
       }
 
-      // Log the response
       _logger.logInfo(
         'Response from $url: ${response.statusCode} ${response.body}',
       );
@@ -203,5 +199,74 @@ class CachedNetworkManager<T> implements NetworkManager<T> {
   @override
   Future<T> delete(String url, {Map<String, String>? headers}) async {
     return _wrapped.delete(url, headers: headers);
+  }
+}
+
+class AuthenticatedNetworkManager<T> implements NetworkManager<T> {
+  final NetworkManager<T> _wrapped;
+  final String _authToken;
+
+  AuthenticatedNetworkManager(this._wrapped, this._authToken);
+
+  @override
+  Future<T> get(
+    String url, {
+    Map<String, String>? headers,
+    Map<String, dynamic>? queryParams,
+  }) {
+    final updatedHeaders = _updateHeaders(headers);
+    return _wrapped.get(
+      url,
+      headers: updatedHeaders,
+      queryParams: queryParams,
+    );
+  }
+
+  @override
+  Future<T> post(
+    String url, {
+    Map<String, String>? headers,
+    dynamic body,
+  }) {
+    final updatedHeaders = _updateHeaders(headers);
+    return _wrapped.post(
+      url,
+      headers: updatedHeaders,
+      body: body,
+    );
+  }
+
+  @override
+  Future<T> put(
+    String url, {
+    Map<String, String>? headers,
+    dynamic body,
+  }) {
+    final updatedHeaders = _updateHeaders(headers);
+    return _wrapped.put(
+      url,
+      headers: updatedHeaders,
+      body: body,
+    );
+  }
+
+  @override
+  Future<T> delete(
+    String url, {
+    Map<String, String>? headers,
+  }) {
+    final updatedHeaders = _updateHeaders(headers);
+    return _wrapped.delete(
+      url,
+      headers: updatedHeaders,
+    );
+  }
+
+  Map<String, String> _updateHeaders(
+    Map<String, String>? headers,
+  ) {
+    final updatedHeaders = headers ?? {};
+    updatedHeaders['Authorization'] = 'Bearer $_authToken';
+    return updatedHeaders;
   }
 }
