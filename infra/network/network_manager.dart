@@ -163,3 +163,45 @@ class NetworkManagerImpl<T> implements NetworkManager<T> {
     return jsonDecode(responseBody) as T;
   }
 }
+
+class CachedNetworkManager<T> implements NetworkManager<T> {
+  final NetworkManager<T> _wrapped;
+  final Map<String, T> _cache = {};
+
+  CachedNetworkManager(this._wrapped);
+
+  @override
+  Future<T> get(
+    String url, {
+    Map<String, String>? headers,
+    Map<String, dynamic>? queryParams,
+  }) async {
+    if (_cache.containsKey(url)) {
+      return _cache[url]!;
+    }
+    final result = await _wrapped.get(
+      url,
+      headers: headers,
+      queryParams: queryParams,
+    );
+    _cache[url] = result;
+    return result;
+  }
+
+  @override
+  Future<T> post(String url,
+      {Map<String, String>? headers, dynamic body}) async {
+    return _wrapped.post(url, headers: headers, body: body);
+  }
+
+  @override
+  Future<T> put(String url,
+      {Map<String, String>? headers, dynamic body}) async {
+    return _wrapped.put(url, headers: headers, body: body);
+  }
+
+  @override
+  Future<T> delete(String url, {Map<String, String>? headers}) async {
+    return _wrapped.delete(url, headers: headers);
+  }
+}
